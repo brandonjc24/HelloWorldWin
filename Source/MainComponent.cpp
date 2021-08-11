@@ -2,21 +2,23 @@
 
 
 
-DualButton::DualButton()
+DualButton::DualButton() 
 {
     addAndMakeVisible(button1);
     addAndMakeVisible(button2);
-
+    /*
     button1.onClick = [this]()
     {
         DBG("Buttons1's size: " << this->button1.getBounds().toString() );
+        timerThing.startTimerHz(2);
     };
 
     button2.onClick = [this]()
     {
         DBG("Buttons2's size: " << this->button2.getBounds().toString());
+        timerThing.startTimerHz(4);
     };
-
+    */
 }
 
 void DualButton::resized()
@@ -24,6 +26,16 @@ void DualButton::resized()
     auto bounds = getLocalBounds();
     button1.setBounds(bounds.removeFromLeft(30));
     button2.setBounds(bounds);
+}
+
+void DualButton::setButton1Handler(std::function<void()> f)
+{
+    button1.onClick = f;
+}
+
+void DualButton::setButton2Handler(std::function<void()> f)
+{
+    button2.onClick = f;
 }
 
 //====================================================================================================
@@ -82,6 +94,18 @@ MainComponent::MainComponent()
     ownedArrayComp.addMouseListener(this, true);
     addAndMakeVisible(dualButton);
     addAndMakeVisible(repeatingThing);
+
+    dualButton.setButton1Handler([this]()
+        {
+            //           DBG("Buttons1's size: " << this->button1.dualButton.getBounds().toString());
+            repeatingThing.startTimerHz(2);
+        });
+    dualButton.setButton2Handler([this]()
+        {
+            //           DBG("Buttons1's size: " << this->button1.dualButton.getBounds().toString());
+            repeatingThing.startTimerHz(4);
+        });
+
 
     setSize (600, 400);
 }
