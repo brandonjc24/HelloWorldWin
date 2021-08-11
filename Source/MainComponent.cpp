@@ -3,7 +3,7 @@
 //==============================================================================
 MainComponent::MainComponent()
 {
-  
+    addAndMakeVisible(ownedArrayComp);
     addAndMakeVisible(comp);
     comp.addMouseListener(this, false);
     setSize (600, 400);
@@ -32,4 +32,5 @@ void MainComponent::resized()
     // update their positions.
 
     comp.setBounds(50, 50, 100, 100);
+    ownedArrayComp.setBounds(comp.getX(), comp.getBottom() + 5, getWidth() - comp.getX(), getHeight() - comp.getBottom() );
 }
