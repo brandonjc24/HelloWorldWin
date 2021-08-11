@@ -19,32 +19,14 @@ private:
     int num = 0;
 };
 
-struct OwnedArrayComponent : juce::Component
+struct OwnedArrayComponent : juce::Component, juce::Button::Listener
 {
-    OwnedArrayComponent()
-    {
-        for (int ii = 0; ii < 10; ++ii)
-        {
-            auto* widget = widgets.add(new Widget(ii));
-            addAndMakeVisible(widget);
-        }
-    }
-
-    void resized() override
-    {
-        auto width = getWidth() / static_cast<float>(widgets.size());
-        int x = 0;
-        auto h = getHeight();
-
-        for (auto* widget : widgets)
-        {
-            widget->setBounds(x, 0, width, h);
-            x += width;
-        }
-
-    }
-
-    juce::OwnedArray<Widget> widgets;
+    OwnedArrayComponent();
+    ~OwnedArrayComponent();
+    void resized() override;
+    void buttonClicked(juce::Button* ) override;
+private:
+    juce::OwnedArray<juce::TextButton> buttons;
 };
 
 struct MyComp : juce::Component
@@ -52,9 +34,9 @@ struct MyComp : juce::Component
     //void resized() override {}
     void paint(juce::Graphics& g) override { g.fillAll(juce::Colours::green); }
 
-    void mouseEnter(const juce::MouseEvent& e) override { DBG("MyComp mouseEnter"); }
-    void mouseExit(const juce::MouseEvent& e) override { DBG("MyComp mouseExit"); }
-    void mouseMove(const juce::MouseEvent& e) override { DBG("MyComp mouseMove " << ++counter); }
+    void mouseEnter(const juce::MouseEvent& e) override { DBG("MyComp mouseEnter");}
+    void mouseExit(const juce::MouseEvent& e)  override { DBG("MyComp mouseExit");}
+    void mouseMove(const juce::MouseEvent& e)  override { DBG("MyComp mouseMove " << ++counter); }
 
 private:
     int counter = 0;
@@ -76,12 +58,25 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    void mouseEnter(const juce::MouseEvent& e) override { DBG("MainComponent mouseEnter "); }
-    void mouseExit(const juce::MouseEvent& e) override { DBG("MainComponent mouseExit " ); }
-    void mouseMove(const juce::MouseEvent& e) override { DBG("MainComponent mouseMove " << ++counter); }
+    void mouseEnter(const juce::MouseEvent& e) override 
+    { 
+        //DBG("MainComponent mouseEnter "); 
+    }
+    void mouseExit(const juce::MouseEvent& e) override 
+    { 
+        //DBG("MainComponent mouseExit " ); 
+    }
+    void mouseMove(const juce::MouseEvent& e) override 
+    { 
+        //DBG("MainComponent mouseMove " << ++counter); 
+    }
+    void mouseDown(const juce::MouseEvent& e) override
+    {
+        DBG("Mouse Click "); 
+    }
 
 private:
-    int counter = 0;
+    //int counter = 0;
     MyComp comp;
     OwnedArrayComponent ownedArrayComp;
 
