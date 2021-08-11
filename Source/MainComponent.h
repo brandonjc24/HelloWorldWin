@@ -2,6 +2,15 @@
 
 #include <JuceHeader.h>
 
+struct DualButton : public juce::Component
+{
+    DualButton();
+    void resized() override;
+private:
+    juce::TextButton button1{ "Button1" }, button2{ "Button2" };
+};
+
+
 struct Widget : juce::Component
 {
     void paint(juce::Graphics& g) override 
@@ -79,6 +88,7 @@ private:
     //int counter = 0;
     MyComp comp;
     OwnedArrayComponent ownedArrayComp;
+    DualButton dualButton;
 
     //==============================================================================
     // Your private member variables go here...
