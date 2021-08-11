@@ -10,6 +10,25 @@ private:
     juce::TextButton button1{ "Button1" }, button2{ "Button2" };
 };
 
+struct RepeatingThing : juce::Component, juce::Timer
+{
+    void timerCallback() override
+    {
+        drawRed = !drawRed;
+        repaint();
+    }
+    void paint(juce::Graphics& g) override
+    {
+        g.fillAll(drawRed ? juce::Colours::red : juce::Colours::green);
+    }
+
+    RepeatingThing() { startTimerHz(2); }
+    ~RepeatingThing() { stopTimer(); }
+
+private:
+    bool drawRed = true;
+};
+
 
 struct Widget : juce::Component
 {
@@ -89,6 +108,7 @@ private:
     MyComp comp;
     OwnedArrayComponent ownedArrayComp;
     DualButton dualButton;
+    RepeatingThing repeatingThing;
 
     //==============================================================================
     // Your private member variables go here...
