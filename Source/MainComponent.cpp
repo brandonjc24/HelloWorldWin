@@ -106,7 +106,7 @@ MainComponent::MainComponent()
             repeatingThing.startTimerHz(4);
         });
 
-
+    addAndMakeVisible(hiResGui);
     setSize (600, 400);
 }
 
@@ -133,9 +133,8 @@ void MainComponent::resized()
     // update their positions.
 
     comp.setBounds(50, 50, 100, 100);
-    ownedArrayComp.setBounds(comp.getX(), comp.getBottom() + 5, getWidth() - comp.getX(), getHeight() - comp.getBottom() );
-    
+    ownedArrayComp.setBounds(comp.getX(), comp.getBottom() + 5, getWidth() - comp.getX(), getHeight() - comp.getBottom() );  
     dualButton.setBounds(comp.getBounds().withX(comp.getRight()+5));
-
     repeatingThing.setBounds(dualButton.getBounds().withX(dualButton.getRight()+5));
+    hiResGui.setBounds(repeatingThing.getBounds().withX(repeatingThing.getRight() + 5));
 }

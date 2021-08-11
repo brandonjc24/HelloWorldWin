@@ -16,6 +16,49 @@ private:
     juce::TextButton button1{ "Button1" }, button2{ "Button2" };
 };
 
+
+struct MyAsyncHighResGui : juce::Component, juce::AsyncUpdater, juce::HighResolutionTimer
+{
+    void handleAsyncUpdate() override
+    {
+        paintColor = (paintColor + 1) % maxColors;
+        repaint();
+    }
+    void hiResTimerCallback() override { triggerAsyncUpdate(); }
+
+    void paint(juce::Graphics& g) override
+    {
+        switch (paintColor)
+        {
+        case 0:
+            g.setColour(juce::Colours::red);
+            break;
+        case 1:
+            g.setColour(juce::Colours::green);
+            break;
+        case 2:
+            g.setColour(juce::Colours::blue);
+            break;
+        }
+        g.fillAll();
+    }
+
+    MyAsyncHighResGui()
+    {
+        this->startTimer(1000 / 5);
+    }
+    ~MyAsyncHighResGui()
+    {
+        stopTimer();
+        this->cancelPendingUpdate();
+    }
+
+private:
+    int paintColor = 0;
+    const int maxColors{ 3 };
+};
+
+
 struct RepeatingThing : juce::Component, juce::Timer
 {
     void timerCallback() override
@@ -115,6 +158,7 @@ private:
     OwnedArrayComponent ownedArrayComp;
     RepeatingThing repeatingThing;
     DualButton dualButton;// {repeatingThing};
+    MyAsyncHighResGui hiResGui;
 
     //==============================================================================
     // Your private member variables go here...
