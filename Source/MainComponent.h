@@ -1,7 +1,8 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include<array>
+#include <array>
+#include "DataRace.h"
 
 //================================================================================
 
@@ -197,7 +198,8 @@ private:
     RepeatingThing repeatingThing;
     DualButton dualButton;// {repeatingThing};
     MyAsyncHighResGui hiResGui;
-    Renderer renderer;
+    //Renderer renderer;
+    Test test;
 
     //==============================================================================
     // Your private member variables go here...
