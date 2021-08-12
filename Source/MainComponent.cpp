@@ -1,7 +1,101 @@
 #include "MainComponent.h"
 
 
+ImageProcessingThread::ImageProcessingThread(int w_, int h_) : juce::Thread("ImageProcessingThread"), w(w_), h(h_)
+{
+    startThread();
+}
+ImageProcessingThread::~ImageProcessingThread()
+{
+    stopThread(500);
+}
+void ImageProcessingThread::run()
+{
+    while (true)
+    {
+        if (threadShouldExit())
+            break;
 
+        auto canvas = juce::Image(juce::Image::PixelFormat::RGB, w, h, true);
+
+        if (threadShouldExit())
+            break;
+
+        bool shouldBail = false;
+        for (int x = 0; x < w; ++x)
+        {
+            if (threadShouldExit())
+            {
+                shouldBail = true;
+                break;
+            }
+            for (int y = 0; y < y; ++y)
+            {
+                canvas.setPixelAt(x, y, juce::Colour(r.nextFloat(), r.nextFloat(), r.nextFloat(), 1.f));
+            }
+        }
+
+        if (threadShouldExit())
+            break;
+
+        if (updateRenderer)
+            updateRenderer(std::move(canvas));
+
+        wait(-1);
+    }
+}
+void ImageProcessingThread::setUpdateRendererFunc(std::function<void(juce::Image&&)> f) { updateRenderer = std::move(f); };
+//================================================================================
+LambdaTimer::LambdaTimer(int ms, std::function<void()> f) : lambda( std::move(f) )
+{
+    startTimer(ms);
+}
+LambdaTimer::~LambdaTimer()
+{
+    stopTimer();
+}
+void LambdaTimer::timerCallback()
+{
+    stopTimer();
+    if (lambda)
+        lambda();
+}
+//================================================================================
+Renderer::Renderer()
+{
+    lambdaTimer = std::make_unique<LambdaTimer>(10, [this]()
+        {
+            processingThread = std::make_unique<ImageProcessingThread>(getWidth(), getHeight());
+            processingThread->setUpdateRendererFunc([this](juce::Image&& image)
+                {
+                    int renderIndex = firstImage ? 0 : 1;
+                    firstImage = !firstImage;
+                    imageToRender[renderIndex] = std::move(image);
+
+                    triggerAsyncUpdate();
+
+                    lambdaTimer = std::make_unique<LambdaTimer>(1000, [this]() 
+                        {
+                            processingThread->notify();
+                        });
+                });
+        });
+}
+
+Renderer::~Renderer()
+{
+    processingThread.reset();
+    lambdaTimer.reset();
+}
+void Renderer::paint(juce::Graphics& g)
+{
+    g.drawImage(firstImage ? imageToRender[0] : imageToRender[1], getLocalBounds().toFloat());
+}
+void Renderer::handleAsyncUpdate()
+{
+    repaint();
+}
+//================================================================================
 DualButton::DualButton() 
 {
     addAndMakeVisible(button1);
@@ -107,9 +201,12 @@ MainComponent::MainComponent()
         });
 
     addAndMakeVisible(hiResGui);
+
+    addAndMakeVisible(renderer);
+
     setSize (600, 400);
 }
-
+    
 MainComponent::~MainComponent()
 {
     comp.removeMouseListener(this);
@@ -123,7 +220,7 @@ void MainComponent::paint (juce::Graphics& g)
 
     g.setFont (juce::Font (16.0f));
     g.setColour (juce::Colours::white);
-    g.drawText ("Hello World!", getLocalBounds(), juce::Justification::centred, true);
+   g.drawText ("Hello World!", getLocalBounds(), juce::Justification::centred, true);
 }
 
 void MainComponent::resized()
@@ -137,4 +234,5 @@ void MainComponent::resized()
     dualButton.setBounds(comp.getBounds().withX(comp.getRight()+5));
     repeatingThing.setBounds(dualButton.getBounds().withX(dualButton.getRight()+5));
     hiResGui.setBounds(repeatingThing.getBounds().withX(repeatingThing.getRight() + 5));
+    renderer.setBounds(hiResGui.getBounds().withX(hiResGui.getRight() + 5));
 }

@@ -1,7 +1,45 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include<array>
 
+//================================================================================
+
+struct ImageProcessingThread : juce::Thread
+{
+    ImageProcessingThread(int w_, int h_);
+    ~ImageProcessingThread();
+    void run() override;
+    void setUpdateRendererFunc(std::function<void(juce::Image&&)> f);
+private:
+    int w{ 0 };
+    int h{ 0 };
+    std::function<void(juce::Image&&)> updateRenderer;
+    juce::Random r;
+};   
+//================================================================================
+struct LambdaTimer : juce::Timer
+{
+    LambdaTimer(int ms, std::function<void()> f);
+    ~LambdaTimer();
+    void timerCallback() override;
+private:
+    std::function<void()> lambda;
+};
+//================================================================================
+struct Renderer : juce::Component, juce::AsyncUpdater
+{
+    Renderer();
+    ~Renderer();
+    void paint(juce::Graphics& g) override;
+    void handleAsyncUpdate() override;
+private:
+    std::unique_ptr<ImageProcessingThread> processingThread;
+    std::unique_ptr<LambdaTimer> lambdaTimer;
+    bool firstImage = true;
+    std::array<juce::Image, 2> imageToRender;
+};
+//================================================================================
 //struct RepeatingThing;
 struct DualButton : public juce::Component
 {
@@ -159,6 +197,7 @@ private:
     RepeatingThing repeatingThing;
     DualButton dualButton;// {repeatingThing};
     MyAsyncHighResGui hiResGui;
+    Renderer renderer;
 
     //==============================================================================
     // Your private member variables go here...
