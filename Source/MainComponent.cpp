@@ -29,9 +29,14 @@ void ImageProcessingThread::run()
                 shouldBail = true;
                 break;
             }
-            for (int y = 0; y < y; ++y)
+            for (int y = 0; y < h; ++y)
             {
-                canvas.setPixelAt(x, y, juce::Colour(r.nextFloat(), r.nextFloat(), r.nextFloat(), 1.f));
+                canvas.setPixelAt(x, 
+                                    y, 
+                                    juce::Colour(r.nextFloat(), 
+                                                    r.nextFloat(), 
+                                                    r.nextFloat(), 
+                                                    1.f));
             }
         }
 
